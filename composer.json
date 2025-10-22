@@ -17,7 +17,7 @@
   "require": {
     "php": "^8.4",
     "ext-pdo": "*",
-    "monolog/monolog": "^3.7",
+    "monolog/monolog": "^3.9",
     "php-di/php-di": "^7.1",
     "phpmailer/phpmailer": "^6.9",
     "slim/psr7": "^1.6",
@@ -34,10 +34,7 @@
   "autoload": {
     "psr-4": {
       "App\\": "src/"
-    },
-    "files": [
-      "src/helpers.php"
-    ]
+    }
   },
 
   "autoload-dev": {

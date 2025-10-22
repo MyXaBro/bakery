@@ -7,9 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: bakery-php
     volumes:
-      - ./src:/var/www/html
-      - ./composer.json:/var/www/html/composer.json
-      - ./composer.lock:/var/www/html/composer.lock
+      - ./:/var/www/html
     environment:
       - APP_ENV=local
       - APP_DEBUG=1
