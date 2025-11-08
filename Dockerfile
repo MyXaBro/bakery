@@ -1,9 +1,9 @@
-FROM php:8.4-fpm-alpine
+FROM php:8.4-fpm
 
-RUN apk add --no-cache git curl libpng-dev libjpeg-turbo-dev libwebp-dev freetype-dev oniguruma-dev autoconf g++ make bash
-
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo pdo_mysql gd
+RUN apt-get update && apt-get install -y \
+    git curl bash libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql sockets \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 

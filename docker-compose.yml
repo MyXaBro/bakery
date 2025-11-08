@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: bakery-php
+    container_name: bakery
     volumes:
       - ./:/var/www/html
     environment:
@@ -16,11 +16,13 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
-      - MAIL_HOST=${MAIL_HOST}
-      - MAIL_PORT=${MAIL_PORT}
-      - MAIL_FROM=${MAIL_FROM}
+      - RABBIT_HOST=${RABBIT_HOST}
+      - RABBIT_PORT=${RABBIT_PORT}
+      - RABBIT_USER=${RABBIT_USER}
+      - RABBIT_PASS=${RABBIT_PASS}
+      - RABBIT_QUEUE=bakery
     depends_on:
-      - db-bakery
+      - rabbitmq
 
   nginx:
     image: nginx:1.27-alpine
@@ -33,42 +35,19 @@ services:
     depends_on:
       - php
 
-  db-bakery:
-    image: mysql:8.0
-    container_name: bakery-mysql
-    environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASS}
-      MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3307:3306"
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 2s
-      retries: 20
-    volumes:
-      - dbdata:/var/lib/mysql
-      - ./sql:/docker-entrypoint-initdb.d
-
-  phpmyadmin:
-    image: phpmyadmin:5.2
-    container_name: bakery-phpmyadmin
-    ports:
-      - "8071:80"
-    environment:
-      PMA_HOST: db-bakery
-      PMA_USER: ${DB_USER}
-      PMA_PASSWORD: ${DB_PASS}
-    depends_on:
-      - db-bakery
-
-  mailhog:
-    image: mailhog/mailhog:v1.0.1
-    container_name: bakery-mailhog
-    ports:
-      - "8025:8025"
+  rabbitmq:
+      image: rabbitmq:3.13-management
+      container_name: bakery-rabbit
+      hostname: rabbitmq
+      ports:
+        - "5672:5672"
+        - "15672:15672"
+      environment:
+        RABBITMQ_DEFAULT_USER: bakery
+        RABBITMQ_DEFAULT_PASS: bakery
+      volumes:
+        - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
   dbdata:
+  rabbitmq_data:
